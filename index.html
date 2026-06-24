@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Wedding of Jainudin & Hijriah</title>
+    <!-- Google Fonts: Playfair Display & Plus Jakarta Sans -->
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['Playfair Display', 'serif'],
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        dark: '#121212',
+                        charcoal: '#1A1A1A',
+                        accent: '#E5E5E5',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Sembunyikan scrollbar bawaan saat amplop masih terkunci */
+        body.locked {
+            overflow: hidden;
+        }
+        
+        /* Animasi Kustom */
+        .fade-in-element {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        
+        .fade-in-element.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        @keyframes pulse-slow {
+            0%, 100% { opacity: 0.3; }
+            50% { opacity: 0.8; }
+        }
+
+        .animate-pulse-slow {
+            animation: pulse-slow 3s infinite ease-in-out;
+        }
+
+        @keyframes spin-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .animate-spin-slow {
+            animation: spin-slow 12s linear infinite;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #121212;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #444;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #666;
+        }
+    </style>
+</head>
+<body class="bg-dark text-gray-200 font-sans antialiased locked selection:bg-white selection:text-black">
+
+    <!-- AUDIO ELEMENT -->
+    <audio id="bgMusic" loop preload="auto">
+        <source src="https://assets.mixkit.co/music/preview/mixkit-beautiful-dream-493.mp3" type="audio/mpeg">
+        Your browser does not support the audio element.
+    </audio>
+
+    <!-- TOAST NOTIFICATION -->
+    <div id="toast" class="fixed bottom-24 left-1/2 transform -translate-x-1/2 bg-white text-black font-semibold px-6 py-3 rounded-full shadow-2xl opacity-0 translate-y-5 transition-all duration-500 z-50 flex items-center gap-2 pointer-events-none text-sm">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-900" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+        </svg>
+        <span id="toastMessage">Teks berhasil disalin!</span>
+    </div>
+
+    <!-- FLOATING MUSIC CONTROLLER -->
+    <div id="musicController" class="fixed bottom-6 right-6 z-40 hidden flex items-center justify-center">
+        <button onclick="toggleMusic()" class="relative flex items-center justify-center w-14 h-14 bg-black border border-white/20 rounded-full shadow-2xl focus:outline-none transition-transform hover:scale-110 active:scale-95 group">
+            <span id="musicPulse" class="absolute inset-0 rounded-full bg-white/10 animate-ping"></span>
+            <svg id="vinylIcon" class="w-8 h-8 text-white transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <circle cx="12" cy="12" r="3"/>
+            </svg>
+            <span id="musicPauseStroke" class="absolute w-full h-full flex items-center justify-center opacity-0 transition-opacity duration-300">
+                <div class="w-1.5 h-6 bg-white/80 rounded mx-0.5"></div>
+                <div class="w-1.5 h-6 bg-white/80 rounded mx-0.5"></div>
+            </span>
+        </button>
+    </div>
+
+    <!-- FLOATING NAVIGATION DOCK -->
+    <div id="navDock" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-40 hidden bg-black/80 backdrop-blur-md border border-white/10 px-4 py-3 rounded-full shadow-2xl max-w-md w-[90%] md:w-auto">
+        <nav class="flex items-center justify-around gap-2 md:gap-6 text-[10px] md:text-xs tracking-wider uppercase font-semibold text-gray-400">
+            <a href="#hero" class="hover:text-white transition-colors py-1 px-2">Beranda</a>
+            <a href="#couple" class="hover:text-white transition-colors py-1 px-2">Mempelai</a>
+            <a href="#event" class="hover:text-white transition-colors py-1 px-2">Acara</a>
+            <a href="#gallery" class="hover:text-white transition-colors py-1 px-2">Galeri</a>
+            <a href="#rsvp" class="hover:text-white transition-colors py-1 px-2">RSVP</a>
+            <a href="#wishes" class="hover:text-white transition-colors py-1 px-2">Ucapan</a>
+        </nav>
+    </div>
+
+    <!-- ENVELOPE / OPENING SCREEN (MODAL OVERLAY) -->
+    <div id="envelopeOverlay" class="fixed inset-0 z-50 flex items-center justify-center bg-black transition-all duration-1000 ease-in-out">
+        <div class="absolute inset-0 bg-[radial-gradient(#ffffff0a_1px,transparent_1px)] [background-size:16px_16px] opacity-60"></div>
+        <div class="absolute inset-4 md:inset-8 border border-white/10 pointer-events-none flex items-center justify-center">
+            <div class="w-[98%] h-[98%] border border-white/5"></div>
+        </div>
+
+        <div class="relative z-10 text-center px-6 max-w-xl flex flex-col items-center">
+            <span class="text-xs uppercase tracking-[0.3em] text-gray-400 mb-4 animate-pulse-slow">Undangan Pernikahan</span>
+            <h1 class="font-serif text-5xl md:text-7xl font-light text-white mb-6 tracking-wide">
+                Jainudin <span class="font-sans font-thin text-3xl md:text-4xl block my-2 text-gray-400">&amp; Hijriah</span>
+            </h1>
+
+            <div class="w-24 h-[1px] bg-gradient-to-r from-transparent via-white/40 to-transparent mb-8"></div>
+
+            <div class="mb-10 bg-white/[0.02] border border-white/5 backdrop-blur-sm px-8 py-6 rounded-lg max-w-xs md:max-w-md w-full">
+                <p class="text-xs uppercase tracking-widest text-gray-500 mb-2">Spesial Kepada Yth.</p>
+                <h3 id="guest-name" class="font-serif text-xl md:text-2xl text-white font-medium mb-1">Tamu Undangan</h3>
+                <p class="text-xs text-gray-400 italic">di Tempat</p>
+            </div>
+
+            <button onclick="openInvitation()" class="group relative px-8 py-4 bg-white text-black font-medium text-sm tracking-[0.2em] uppercase rounded-none overflow-hidden transition-all duration-500 hover:bg-black hover:text-white border border-white focus:outline-none shadow-lg">
+                <span class="relative z-10 flex items-center gap-2">
+                    Buka Undangan
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 transform transition-transform group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                    </svg>
+                </span>
+                <span class="absolute inset-0 bg-black transition-transform duration-500 transform translate-y-full group-hover:translate-y-0"></span>
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN WEBSITE CONTENT CONTAINER -->
+    <div id="mainContent" class="opacity-0 transition-opacity duration-1000">
+
+        <!-- 1. HERO BANNER SECTION -->
+        <section id="hero" class="relative h-screen flex items-center justify-center overflow-hidden bg-black">
+            <div id="heroBg" class="absolute inset-0 bg-cover bg-center bg-no-repeat transition-transform duration-700 ease-out scale-110" style="background-image: url('https://lh3.googleusercontent.com/d/1Mdb-iUpf5w1WZeUSafaB-XkRXXUEfWio');"></div>
+            <div class="absolute inset-0 bg-gradient-to-b from-black/80 via-black/40 to-dark"></div>
+
+            <div class="relative z-10 text-center px-6 mt-12">
+                <span class="text-xs md:text-sm uppercase tracking-[0.4em] text-white/70 block mb-4">The Wedding of</span>
+                <h1 class="font-serif text-6xl md:text-9xl font-light text-white tracking-wide mb-6">
+                    Jainudin &amp; Hijriah
+                </h1>
+                <p class="text-sm md:text-base tracking-[0.25em] uppercase text-gray-300 font-light max-w-md mx-auto border-y border-white/10 py-3">
+                    Minggu, 05 Juli 2026
+                </p>
+                <div class="absolute bottom-12 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-2">
+                    <span class="text-[9px] uppercase tracking-[0.2em] text-gray-500">Gulir ke bawah</span>
+                    <div class="w-6 h-10 border border-white/20 rounded-full p-1 flex justify-center">
+                        <div class="w-1.5 h-3 bg-white/60 rounded-full animate-bounce"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. NARRATIVE / INTRO QUOTE SECTION -->
+        <section class="py-24 px-6 bg-dark relative overflow-hidden">
+            <div class="absolute inset-0 bg-[radial-gradient(#ffffff04_1px,transparent_1px)] [background-size:24px_24px]"></div>
+            <div class="max-w-3xl mx-auto text-center relative z-10 fade-in-element">
+                <div class="inline-flex items-center gap-4 mb-8">
+                    <div class="w-12 h-[0.5px] bg-white/20"></div>
+                    <span class="font-serif italic text-lg text-white">The Prologue</span>
+                    <div class="w-12 h-[0.5px] bg-white/20"></div>
+                </div>
+                <blockquote class="font-serif text-lg md:text-2xl text-gray-300 italic leading-relaxed mb-8 px-4 md:px-12">
+                    "Dan di antara tanda-tanda (kebesaran)-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri, agar kamu cenderung dan merasa tenteram kepadanya, dan Dia menjadikan di antaramu rasa kasih dan sayang. Sungguh, pada yang demikian itu benar-benar terdapat tanda-tanda bagi kaum yang berpikir."
+                </blockquote>
+                <p class="text-xs uppercase tracking-widest text-gray-500">— QS. Ar-Rum: 21</p>
+            </div>
+        </section>
+
+        <!-- 3. MEMPELAI (THE COUPLE) SECTION -->
+        <section id="couple" class="py-28 px-6 bg-charcoal border-y border-white/5 relative">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-20 fade-in-element">
+                    <span class="text-xs uppercase tracking-[0.3em] text-gray-500 block mb-2">Mempelai Pria &amp; Wanita</span>
+                    <h2 class="font-serif text-4xl md:text-5xl font-light text-white tracking-wide">Mempelai Indah</h2>
+                    <div class="w-16 h-[1px] bg-white/20 mx-auto mt-4"></div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+                    <!-- Groom Side (Jainudin) -->
+                    <div class="flex flex-col items-center text-center fade-in-element">
+                        <div class="relative group mb-8">
+                            <div class="absolute -inset-4 border border-white/5 rounded-full scale-95 group-hover:scale-100 transition-transform duration-700"></div>
+                            <div class="w-56 h-56 md:w-64 md:h-64 rounded-full overflow-hidden border border-white/20 bg-dark p-2 transition-transform duration-700 group-hover:rotate-1">
+                                <div class="w-full h-full rounded-full bg-cover bg-center bg-gray-900" style="background-image: url('https://lh3.googleusercontent.com/d/1nOx3WG-UE-FsDCaUqIZvIXur7KiBs2AX');"></div>
+                            </div>
+                        </div>
+                        <h3 class="font-serif text-3xl font-semibold text-white tracking-wide mb-2">Jainudin</h3>
+                        <p class="text-xs uppercase tracking-widest text-gray-400 mb-4 font-bold">Mempelai Pria</p>
+                        <div class="max-w-sm px-4">
+                            <p class="text-sm text-gray-300 leading-relaxed">
+                                Putra pertama dari Bapak Masdani &amp; Ibu Pujianti. Seorang pribadi yang tulus dan berdedikasi tinggi untuk melangkah di jalan pengabdian suci pernikahan.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Bride Side (Hijriah) -->
+                    <div class="flex flex-col items-center text-center fade-in-element">
+                        <div class="relative group mb-8">
+                            <div class="absolute -inset-4 border border-white/5 rounded-full scale-95 group-hover:scale-100 transition-transform duration-700"></div>
+                            <div class="w-56 h-56 md:w-64 md:h-64 rounded-full overflow-hidden border border-white/20 bg-dark p-2 transition-transform duration-700 group-hover:-rotate-1">
+                                <div class="w-full h-full rounded-full bg-cover bg-center bg-gray-900" style="background-image: url('https://lh3.googleusercontent.com/d/132Q6n3VA8LDU6esUdegUN1rwl9Wz9M4T');"></div>
+                            </div>
+                        </div>
+                        <h3 class="font-serif text-3xl font-semibold text-white tracking-wide mb-2">Hijriah</h3>
+                        <p class="text-xs uppercase tracking-widest text-gray-400 mb-4 font-bold">Mempelai Wanita</p>
+                        <div class="max-w-sm px-4">
+                            <p class="text-sm text-gray-300 leading-relaxed">
+                                Anak kedua dari keluarga Bapak Ariani  &amp; Ibu Aida. Sosok yang anggun, lembut, penuh kasih sayang, dan siap menemani perjalanan membangun surga kecil duniawi.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. LOVE STORY SECTION -->
+        <section class="py-24 px-6 bg-dark relative overflow-hidden">
+            <div class="max-w-4xl mx-auto border border-white/10 p-8 md:p-16 relative z-10 fade-in-element">
+                <div class="absolute inset-2 border border-white/5"></div>
+                <div class="text-center relative z-10">
+                    <span class="text-xs uppercase tracking-[0.35em] text-gray-500 block mb-4">Kisah Kami</span>
+                    <h2 class="font-serif text-3xl md:text-4xl text-white font-light tracking-wide mb-8">Our Love Story</h2>
+                    <div class="w-12 h-[1px] bg-white/20 mx-auto mb-8"></div>
+                    <p class="font-serif text-lg md:text-xl text-gray-200 italic leading-relaxed max-w-2xl mx-auto mb-6 px-4">
+                        "Cinta kita tidak selalu tentang kembang api yang meriah. Kadang, ia berbentuk percakapan tenang di malam hari, saling mendengarkan keluh kesah, dan keyakinan bahwa besok kita akan menghadapi dunia bersama lagi."
+                    </p>
+                    <div class="text-xs uppercase tracking-widest text-gray-500 mt-4 font-bold">— Jainudin &amp; Hijriah</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5. COUNTDOWN TIMER SECTION -->
+        <section class="py-20 px-6 bg-charcoal border-y border-white/5 relative">
+            <div class="max-w-4xl mx-auto text-center fade-in-element">
+                <span class="text-xs uppercase tracking-[0.3em] text-gray-500 block mb-3">Waktu Menuju Bahagia</span>
+                <h3 class="font-serif text-3xl md:text-4xl text-white font-light tracking-wide mb-8">Menghitung Hari-H</h3>
+                
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 max-w-2xl mx-auto">
+                    <div class="bg-black/40 border border-white/5 backdrop-blur px-4 py-6 rounded-lg">
+                        <span id="days" class="font-serif text-4xl md:text-5xl text-white font-light block mb-2">00</span>
+                        <span class="text-[10px] md:text-xs uppercase tracking-widest text-gray-500">Hari</span>
+                    </div>
+                    <div class="bg-black/40 border border-white/5 backdrop-blur px-4 py-6 rounded-lg">
+                        <span id="hours" class="font-serif text-4xl md:text-5xl text-white font-light block mb-2">00</span>
+                        <span class="text-[10px] md:text-xs uppercase tracking-widest text-gray-500">Jam</span>
+                    </div>
+                    <div class="bg-black/40 border border-white/5 backdrop-blur px-4 py-6 rounded-lg">
+                        <span id="minutes" class="font-serif text-4xl md:text-5xl text-white font-light block mb-2">00</span>
+                        <span class="text-[10px] md:text-xs uppercase tracking-widest text-gray-500">Menit</span>
+                    </div>
+                    <div class="bg-black/40 border border-white/5 backdrop-blur px-4 py-6 rounded-lg">
+                        <span id="seconds" class="font-serif text-4xl md:text-5xl text-white font-light block mb-2">00</span>
+                        <span class="text-[10px] md:text-xs uppercase tracking-widest text-gray-500">Detik</span>
+                    </div>
+                </div>
+
+                <a href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=Pernikahan+Jainudin+%26+Hijriah&amp;dates=20260705T010000Z/20260705T040000Z&amp;details=Pernikahan+Jainudin+dan+Hijriah+bertempat+di+KUA+Sungai+Tabuk+dan+Sungai+Tandipah.&amp;location=KUA+Sungai+Tabuk+%26+Sungai+Tandipah&amp;sf=true&amp;output=xml" target="_blank" class="inline-flex items-center gap-2 mt-12 px-6 py-3 bg-transparent border border-white/20 text-white hover:bg-white hover:text-black hover:border-white transition-all duration-300 text-xs tracking-widest uppercase">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                    Simpan Tanggal di Kalender
+                </a>
+            </div>
+        </section>
+
+        <!-- 6. AGENDA & LOKASI ACARA SECTION -->
+        <section id="event" class="py-28 px-6 bg-dark relative">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-20 fade-in-element">
+                    <span class="text-xs uppercase tracking-[0.3em] text-gray-500 block mb-2">Agenda Sakral</span>
+                    <h2 class="font-serif text-4xl md:text-5xl font-light text-white tracking-wide">Acara Pernikahan</h2>
+                    <p class="text-xs text-gray-400 mt-2">Dua Upacara, Satu Komitmen Abadi</p>
+                    <div class="w-16 h-[1px] bg-white/20 mx-auto mt-4"></div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-stretch">
+                    <!-- Akad Nikah Card -->
+                    <div class="bg-charcoal/50 border border-white/5 p-8 md:p-12 rounded-lg flex flex-col justify-between items-center text-center relative overflow-hidden fade-in-element group hover:border-white/20 transition-all duration-500">
+                        <div class="absolute top-0 right-0 p-4 opacity-10">
+                            <svg class="w-20 h-20 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M12 2v20M2 12h20M5 5l14 14M19 5L5 19"/></svg>
+                        </div>
+                        
+                        <div class="mb-8 flex flex-col items-center">
+                            <span class="text-xs uppercase tracking-widest text-gray-400 font-bold mb-3">Bagian I</span>
+                            <h3 class="font-serif text-3xl text-white font-medium mb-4">Akad Nikah</h3>
+                            <div class="w-10 h-[1px] bg-white/15 mb-6"></div>
+                            
+                            <p class="text-sm text-gray-300 font-medium tracking-wide mb-1">Kamis, 25 Juni 2026</p>
+                            <p class="text-sm text-white font-semibold tracking-wide mb-6">09:00 WITA — Selesai</p>
+                            
+                            <p class="text-xs uppercase tracking-widest text-gray-500 mb-1">Lokasi Acara</p>
+                            <p class="text-base text-gray-200 font-serif font-medium">KUA Sungai Tabuk</p>
+                            <p class="text-xs text-gray-400 mt-1">Kec. Sungai Tabuk, Kabupaten Banjar, Kalimantan Selatan</p>
+                        </div>
+                        
+                        <a href="https://maps.google.com/?q=KUA+Sungai+Tabuk" target="_blank" class="w-full py-4 border border-white/10 hover:border-white hover:bg-white hover:text-black transition-all duration-300 text-xs tracking-widest uppercase font-medium mt-auto flex items-center justify-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            Petunjuk Rute Akad
+                        </a>
+                    </div>
+
+                    <!-- Resepsi Pernikahan Card -->
+                    <div class="bg-charcoal/50 border border-white/5 p-8 md:p-12 rounded-lg flex flex-col justify-between items-center text-center relative overflow-hidden fade-in-element group hover:border-white/20 transition-all duration-500">
+                        <div class="absolute top-0 right-0 p-4 opacity-10">
+                            <svg class="w-20 h-20 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M12 2v20M2 12h20M5 5l14 14M19 5L5 19"/></svg>
+                        </div>
+
+                        <div class="mb-8 flex flex-col items-center">
+                            <span class="text-xs uppercase tracking-widest text-gray-400 font-bold mb-3">Bagian II</span>
+                            <h3 class="font-serif text-3xl text-white font-medium mb-4">Resepsi Pernikahan</h3>
+                            <div class="w-10 h-[1px] bg-white/15 mb-6"></div>
+                            
+                            <p class="text-sm text-gray-300 font-medium tracking-wide mb-1">Minggu, 05 Juli 2026</p>
+                            <p class="text-sm text-white font-semibold tracking-wide mb-6">08:00 WITA — Selesai</p>
+                            
+                            <p class="text-xs uppercase tracking-widest text-gray-500 mb-1">Lokasi Acara</p>
+                            <p class="text-base text-gray-200 font-serif font-medium">Sungai Tandipah RT.01</p>
+                            <p class="text-xs text-gray-400 mt-1">Kecamatan Sungai Tabuk, Kabupaten Banjar, Kalimantan Selatan</p>
+                        </div>
+                        
+                        <a href="https://maps.google.com/?q=Sungai+tandipah+RT.01+kecamatan+sungai+Tabuk+kabupaten+Banjar" target="_blank" class="w-full py-4 border border-white/10 hover:border-white hover:bg-white hover:text-black transition-all duration-300 text-xs tracking-widest uppercase font-medium mt-auto flex items-center justify-center gap-2">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            Petunjuk Rute Resepsi
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. GALERI FOTO PASANGAN SECTION -->
+        <section id="gallery" class="py-28 px-6 bg-charcoal border-y border-white/5 relative">
+            <div class="max-w-6xl mx-auto">
+                <div class="text-center mb-20 fade-in-element">
+                    <span class="text-xs uppercase tracking-[0.3em] text-gray-500 block mb-2">Momen Indah</span>
+                    <h2 class="font-serif text-4xl md:text-5xl font-light text-white tracking-wide">Galeri Prewedding</h2>
+                    <div class="w-16 h-[1px] bg-white/20 mx-auto mt-4"></div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <div class="relative overflow-hidden group aspect-square bg-dark border border-white/5 cursor-pointer rounded-lg fade-in-element" onclick="openLightbox(0)">
+                        <div class="w-full h-full bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-110" style="background-image: url('https://lh3.googleusercontent.com/d/1nOx3WG-UE-FsDCaUqIZvIXur7KiBs2AX');"></div>
+                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                            <span class="text-white text-xs uppercase tracking-widest font-semibold border border-white/40 px-4 py-2 bg-black/20 backdrop-blur-sm">Lihat Detail</span>
+                        </div>
+                    </div>
+                    <div class="relative overflow-hidden group aspect-square bg-dark border border-white/5 cursor-pointer rounded-lg fade-in-element" onclick="openLightbox(1)">
+                        <div class="w-full h-full bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-110" style="background-image: url('https://lh3.googleusercontent.com/d/132Q6n3VA8LDU6esUdegUN1rwl9Wz9M4T');"></div>
+                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                            <span class="text-white text-xs uppercase tracking-widest font-semibold border border-white/40 px-4 py-2 bg-black/20 backdrop-blur-sm">Lihat Detail</span>
+                        </div>
+                    </div>
+                    <div class="relative overflow-hidden group aspect-square bg-dark border border-white/5 cursor-pointer rounded-lg fade-in-element" onclick="openLightbox(2)">
+                        <div class="w-full h-full bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-110" style="background-image: url('https://lh3.googleusercontent.com/d/1j-mXUfL9SirIbCjL1hnNAL62xR0bb6iF');"></div>
+                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                            <span class="text-white text-xs uppercase tracking-widest font-semibold border border-white/40 px-4 py-2 bg-black/20 backdrop-blur-sm">Lihat Detail</span>
+                        </div>
+                    </div>
+                    <div class="relative overflow-hidden group aspect-square bg-dark border border-white/5 cursor-pointer rounded-lg fade-in-element" onclick="openLightbox(3)">
+                        <div class="w-full h-full bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-110" style="background-image: url('https://lh3.googleusercontent.com/d/1lswZsaaeDkW_PzmGd-7Zcek4pRSM4TsW');"></div>
+                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                            <span class="text-white text-xs uppercase tracking-widest font-semibold border border-white/40 px-4 py-2 bg-black/20 backdrop-blur-sm">Lihat Detail</span>
+                        </div>
+                    </div>
+                    <div class="relative overflow-hidden group aspect-square bg-dark border border-white/5 cursor-pointer rounded-lg fade-in-element" onclick="openLightbox(4)">
+                        <div class="w-full h-full bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-110" style="background-image: url('https://lh3.googleusercontent.com/d/1g_yIaSmo2YFGJTodP732QZypBcXPjRJF');"></div>
+                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                            <span class="text-white text-xs uppercase tracking-widest font-semibold border border-white/40 px-4 py-2 bg-black/20 backdrop-blur-sm">Lihat Detail</span>
+                        </div>
+                    </div>
+                    <div class="relative overflow-hidden group aspect-square bg-dark border border-white/5 cursor-pointer rounded-lg fade-in-element" onclick="openLightbox(5)">
+                        <div class="w-full h-full bg-cover bg-center transition-transform duration-700 ease-out group-hover:scale-110" style="background-image: url('https://lh3.googleusercontent.com/d/1Yav_AK3T3IorJ0ong1A8S_Srr2v0OoRu');"></div>
+                        <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                            <span class="text-white text-xs uppercase tracking-widest font-semibold border border-white/40 px-4 py-2 bg-black/20 backdrop-blur-sm">Lihat Detail</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 8. WEDDING GIFT SECTION -->
+        <section class="py-24 px-6 bg-dark relative overflow-hidden">
+            <div class="max-w-4xl mx-auto border border-white/10 p-8 md:p-16 relative z-10 text-center fade-in-element">
+                <div class="absolute inset-2 border border-white/5"></div>
+                <div class="relative z-10">
+                    <span class="text-xs uppercase tracking-[0.3em] text-gray-500 block mb-3">Tanda Kasih</span>
+                    <h2 class="font-serif text-3xl md:text-4xl text-white font-light tracking-wide mb-4">Wedding Gift</h2>
+                    <p class="text-sm text-gray-400 max-w-md mx-auto mb-10 leading-relaxed">
+                        Doa restu Anda adalah berkah paling istimewa. Namun jika ingin mengirimkan tanda cinta kasih digital, silakan gunakan nomor rekening resmi di bawah ini:
+                    </p>
+
+                    <div class="max-w-md mx-auto">
+                        <div class="bg-charcoal/40 border border-white/5 rounded-lg p-6 text-center flex flex-col items-center">
+                            <span class="text-sm font-semibold uppercase tracking-wider text-white mb-2">BANK RAKYAT INDONESIA (BRI)</span>
+                            <span class="text-xs text-gray-400 mb-4 block">A/N Jainudin</span>
+                            <div class="bg-black/60 border border-white/10 text-white font-mono text-lg py-3 px-4 rounded-md tracking-wider mb-4 w-full flex items-center justify-between">
+                                <span id="norek1">453201006594503</span>
+                                <button onclick="copyAccount('norek1', this)" class="hover:text-gray-400 transition-colors p-1" title="Salin Rekening">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 9. RSVP FORM SECTION -->
+        <section id="rsvp" class="py-28 px-6 bg-charcoal border-y border-white/5 relative">
+            <div class="max-w-4xl mx-auto">
+                <div class="text-center mb-16 fade-in-element">
+                    <span class="text-xs uppercase tracking-[0.3em] text-gray-500 block mb-2">Konfirmasi Kehadiran</span>
+                    <h2 class="font-serif text-4xl md:text-5xl font-light text-white tracking-wide">RSVP Online</h2>
+                    <div class="w-16 h-[1px] bg-white/20 mx-auto mt-4"></div>
+                </div>
+
+                <div class="bg-dark/60 border border-white/5 p-8 md:p-12 rounded-xl backdrop-blur-sm max-w-2xl mx-auto fade-in-element">
+                    <form id="rsvpForm" class="space-y-6">
+                        <div>
+                            <label class="block text-xs uppercase tracking-widest text-gray-400 mb-2 font-medium">Nama Lengkap</label>
+                            <input type="text" id="rsvp-name" required class="w-full bg-black/40 border border-white/10 rounded-md py-3 px-4 text-white focus:outline-none focus:border-white transition-colors placeholder:text-gray-600 text-sm" placeholder="Nama Anda">
+                        </div>
+
+                        <div>
+                            <label class="block text-xs uppercase tracking-widest text-gray-400 mb-2 font-medium">Status Kehadiran</label>
+                            <div class="grid grid-cols-3 gap-3">
+                                <label class="border border-white/10 bg-black/20 rounded-md p-3 flex flex-col items-center justify-center cursor-pointer hover:border-white/40 transition-all group">
+                                    <input type="radio" name="attendance" value="Hadir" checked class="sr-only peer">
+                                    <div class="w-4 h-4 rounded-full border border-gray-600 flex items-center justify-center mb-2 peer-checked:bg-white">
+                                        <div class="w-1.5 h-1.5 bg-black rounded-full"></div>
+                                    </div>
+                                    <span class="text-xs text-gray-400 select-none">Hadir</span>
+                                </label>
+                                <label class="border border-white/10 bg-black/20 rounded-md p-3 flex flex-col items-center justify-center cursor-pointer hover:border-white/40 transition-all group">
+                                    <input type="radio" name="attendance" value="Ragu-ragu" class="sr-only peer">
+                                    <div class="w-4 h-4 rounded-full border border-gray-600 flex items-center justify-center mb-2 peer-checked:bg-white">
+                                        <div class="w-1.5 h-1.5 bg-black rounded-full"></div>
+                                    </div>
+                                    <span class="text-xs text-gray-400 select-none">Ragu-ragu</span>
+                                </label>
+                                <label class="border border-white/10 bg-black/20 rounded-md p-3 flex flex-col items-center justify-center cursor-pointer hover:border-white/40 transition-all group">
+                                    <input type="radio" name="attendance" value="Tidak Hadir" class="sr-only peer">
+                                    <div class="w-4 h-4 rounded-full border border-gray-600 flex items-center justify-center mb-2 peer-checked:bg-white">
+                                        <div class="w-1.5 h-1.5 bg-black rounded-full"></div>
+                                    </div>
+                                    <span class="text-xs text-gray-400 select-none">Tidak Hadir</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs uppercase tracking-widest text-gray-400 mb-2 font-medium">Jumlah Tamu</label>
+                            <select id="rsvp-guests" class="w-full bg-black/40 border border-white/10 rounded-md py-3 px-4 text-white focus:outline-none focus:border-white transition-colors text-sm">
+                                <option value="1">1 Orang</option>
+                                <option value="2">2 Orang</option>
+                                <option value="3">3 Orang</option>
+                                <option value="4">4 Orang</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs uppercase tracking-widest text-gray-400 mb-2 font-medium">Pesan / Doa Hangat</label>
+                            <textarea id="rsvp-message" rows="4" required class="w-full bg-black/40 border border-white/10 rounded-md py-3 px-4 text-white focus:outline-none focus:border-white transition-colors placeholder:text-gray-600 text-sm" placeholder="Tuliskan ucapan Anda disini..."></textarea>
+                        </div>
+
+                        <button type="submit" id="submitBtn" class="w-full py-4 bg-white text-black text-xs uppercase tracking-[0.2em] font-semibold transition-all hover:bg-black hover:text-white border border-white duration-300 flex items-center justify-center gap-2">
+                            <span>Kirim Konfirmasi</span>
+                            <svg id="loadingSpinner" class="hidden animate-spin h-4 w-4 text-black" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- 10. KOLOM UCAPAN TAMU / GUESTBOOK SECTION -->
+        <section id="wishes" class="py-28 px-6 bg-dark relative">
+            <div class="max-w-4xl mx-auto">
+                <div class="text-center mb-16 fade-in-element">
+                    <span class="text-xs uppercase tracking-[0.3em] text-gray-500 block mb-2">Untaian Doa &amp; Restu</span>
+                    <h2 class="font-serif text-4xl md:text-5xl font-light text-white tracking-wide">Pesan &amp; Doa</h2>
+                    <div class="w-16 h-[1px] bg-white/20 mx-auto mt-4"></div>
+                </div>
+
+                <div class="bg-charcoal/40 border border-white/5 rounded-lg p-6 text-center max-w-2xl mx-auto mb-10 fade-in-element">
+                    <p class="text-sm text-gray-300 italic">
+                        "Kehadiran kalian adalah pelengkap kebahagiaan kami. Di kolam ucapan ini, titipkan doa dan harapan terbaikmu untuk langkah awal kami berdua. 🤍"
+                    </p>
+                </div>
+
+                <!-- Wishes Guestbook List -->
+                <div class="max-w-2xl mx-auto space-y-6">
+                    <div id="wishesContainer" class="space-y-4 max-h-[500px] overflow-y-auto pr-2 custom-scrollbar">
+                        <!-- Items rendered dynamically from Local Storage -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- FOOTER SECTION -->
+        <footer class="py-16 bg-black border-t border-white/5 text-center px-6">
+            <div class="max-w-md mx-auto">
+                <h4 class="font-serif text-3xl text-white font-light tracking-widest mb-4">Jainudin &amp; Hijriah</h4>
+                <p class="text-xs text-gray-500 uppercase tracking-[0.2em] mb-8">Terima Kasih Atas Doa Restu Anda</p>
+                <div class="w-10 h-[0.5px] bg-white/20 mx-auto mb-8"></div>
+                <p class="text-[10px] text-gray-600 tracking-wider">
+                    © 2026 Jainudin &amp; Hijriah Wedding Invitation.
+                </p>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- LIGHTBOX MODAL FOR IMAGES -->
+    <div id="lightbox" class="fixed inset-0 z-50 bg-black/95 flex items-center justify-center hidden opacity-0 transition-opacity duration-300">
+        <button onclick="closeLightbox()" class="absolute top-6 right-6 text-white/70 hover:text-white transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+        </button>
+        <button onclick="prevImage()" class="absolute left-4 text-white/50 hover:text-white transition-colors md:left-8">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+            </svg>
+        </button>
+        <button onclick="nextImage()" class="absolute right-4 text-white/50 hover:text-white transition-colors md:right-8">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+            </svg>
+        </button>
+        <div class="max-w-[90%] max-h-[80%]">
+            <img id="lightboxImg" class="max-w-full max-h-full rounded-md shadow-2xl object-contain border border-white/10" src="" alt="Prewedding">
+        </div>
+    </div>
+
+    <!-- MAIN INTERACTIVE SCRIPT -->
+    <script>
+        // ----------------- CONFIGURATIONS -----------------
+        // TEMPELKAN URL Web App Google Apps Script Anda di sini:
+        const GOOGLE_SHEETS_URL = "YOUR_DEPLOYED_WEB_APP_URL";
+        
+        const galleryImages = [
+            'https://lh3.googleusercontent.com/d/1nOx3WG-UE-FsDCaUqIZvIXur7KiBs2AX',
+            'https://lh3.googleusercontent.com/d/132Q6n3VA8LDU6esUdegUN1rwl9Wz9M4T',
+            'https://lh3.googleusercontent.com/d/1j-mXUfL9SirIbCjL1hnNAL62xR0bb6iF',
+            'https://lh3.googleusercontent.com/d/1lswZsaaeDkW_PzmGd-7Zcek4pRSM4TsW',
+            'https://lh3.googleusercontent.com/d/1g_yIaSmo2YFGJTodP732QZypBcXPjRJF',
+            'https://lh3.googleusercontent.com/d/1Yav_AK3T3IorJ0ong1A8S_Srr2v0OoRu'
+        ];
+
+        let currentImageIndex = 0;
+        let isMusicPlaying = false;
+
+        // On Page Load
+        window.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const guestName = urlParams.get('to');
+            if (guestName) {
+                document.getElementById('guest-name').innerText = guestName;
+            }
+            
+            // Set up initial simulated local comments if empty
+            if (!localStorage.getItem('wedding_wishes_offline')) {
+                const initialWishes = [
+                    { name: "Syarif & Keluarga", status: "Hadir", message: "Selamat menempuh hidup baru Jainudin dan Hijriah! Semoga menjadi keluarga yang sakinah, mawaddah, dan warahmah. Tuntun langkah bersama dalam rida Allah SWT.", timestamp: Date.now() - 3600000 },
+                    { name: "Rahmah Amalia", status: "Hadir", message: "Masyaallah cantiknya calon pengantin wanita. Selamat ya Hijriah! Semoga dilancarkan semua urusan sampai hari-H.", timestamp: Date.now() - 7200000 },
+                    { name: "Fathurrahman", status: "Ragu-ragu", message: "Selamat bro Jainudin! Lancar sampai hari akad tiba. Insyaallah diusahakan hadir langsung ke Sungai Tabuk nanti.", timestamp: Date.now() - 10800000 }
+                ];
+                localStorage.setItem('wedding_wishes_offline', JSON.stringify(initialWishes));
+            }
+            
+            renderLocalWishes();
+            startCountdown();
+            initScrollAnimations();
+        });
+
+        // 1. OPEN INVITATION
+        function openInvitation() {
+            document.body.classList.remove('locked');
+            
+            const envelope = document.getElementById('envelopeOverlay');
+            envelope.classList.add('opacity-0', 'scale-105', 'pointer-events-none');
+            
+            const mainContent = document.getElementById('mainContent');
+            mainContent.classList.remove('opacity-0');
+            mainContent.classList.add('opacity-100');
+            
+            document.getElementById('musicController').classList.remove('hidden');
+            document.getElementById('navDock').classList.remove('hidden');
+
+            const bgMusic = document.getElementById('bgMusic');
+            bgMusic.play().then(() => {
+                isMusicPlaying = true;
+                updateMusicButtonState();
+            }).catch(e => {
+                console.log("Audio autoplay blocked by browser policy.");
+            });
+
+            setTimeout(() => {
+                window.dispatchEvent(new Event('scroll'));
+            }, 100);
+        }
+
+        // 2. BACKGROUND MUSIC CONTROLLER
+        function toggleMusic() {
+            const bgMusic = document.getElementById('bgMusic');
+            if (isMusicPlaying) {
+                bgMusic.pause();
+                isMusicPlaying = false;
+            } else {
+                bgMusic.play();
+                isMusicPlaying = true;
+            }
+            updateMusicButtonState();
+        }
+
+        function updateMusicButtonState() {
+            const vinylIcon = document.getElementById('vinylIcon');
+            const musicPulse = document.getElementById('musicPulse');
+            const musicPauseStroke = document.getElementById('musicPauseStroke');
+
+            if (isMusicPlaying) {
+                vinylIcon.classList.add('animate-spin-slow');
+                vinylIcon.classList.remove('opacity-0');
+                musicPauseStroke.classList.remove('opacity-100');
+                musicPauseStroke.classList.add('opacity-0');
+                musicPulse.classList.remove('hidden');
+            } else {
+                vinylIcon.classList.remove('animate-spin-slow');
+                vinylIcon.classList.add('opacity-0');
+                musicPauseStroke.classList.remove('opacity-0');
+                musicPauseStroke.classList.add('opacity-100');
+                musicPulse.classList.add('hidden');
+            }
+        }
+
+        // 3. COUNTDOWN TIMER
+        function startCountdown() {
+            const targetDate = new Date("2026-07-05T09:00:00+08:00").getTime();
+
+            const interval = setInterval(() => {
+                const now = new Date().getTime();
+                const distance = targetDate - now;
+
+                if (distance < 0) {
+                    clearInterval(interval);
+                    document.getElementById('days').innerText = "00";
+                    document.getElementById('hours').innerText = "00";
+                    document.getElementById('minutes').innerText = "00";
+                    document.getElementById('seconds').innerText = "00";
+                    return;
+                }
+
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                document.getElementById('days').innerText = days.toString().padStart(2, '0');
+                document.getElementById('hours').innerText = hours.toString().padStart(2, '0');
+                document.getElementById('minutes').innerText = minutes.toString().padStart(2, '0');
+                document.getElementById('seconds').innerText = seconds.toString().padStart(2, '0');
+            }, 1000);
+        }
+
+        // 4. COPY BANK ACCOUNT
+        function copyAccount(elementId, button) {
+            const textToCopy = document.getElementById(elementId).innerText;
+            const tempTextArea = document.createElement("textarea");
+            tempTextArea.value = textToCopy;
+            document.body.appendChild(tempTextArea);
+            tempTextArea.select();
+            
+            try {
+                document.execCommand('copy');
+                showToast("Nomor rekening berhasil disalin!");
+                const originalHTML = button.innerHTML;
+                button.innerHTML = `
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                `;
+                setTimeout(() => {
+                    button.innerHTML = originalHTML;
+                }, 2000);
+            } catch (err) {
+                showToast("Gagal menyalin nomor rekening.");
+            }
+            document.body.removeChild(tempTextArea);
+        }
+
+        // TOAST SYSTEM
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toastMessage').innerText = message;
+            
+            toast.classList.remove('opacity-0', 'translate-y-5');
+            toast.classList.add('opacity-100', 'translate-y-0');
+            
+            setTimeout(() => {
+                toast.classList.remove('opacity-100', 'translate-y-0');
+                toast.classList.add('opacity-0', 'translate-y-5');
+            }, 3000);
+        }
+
+        // 5. RSVP & GOOGLE SHEETS FORM HANDLER
+        async function handleRSVP(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('rsvp-name').value.trim();
+            const attendance = document.querySelector('input[name="attendance"]:checked').value;
+            const guests = document.getElementById('rsvp-guests').value;
+            const message = document.getElementById('rsvp-message').value.trim();
+
+            if (!name || !message) {
+                showToast("Harap isi semua kolom formulir.");
+                return;
+            }
+
+            const submitBtn = document.getElementById('submitBtn');
+            const spinner = document.getElementById('loadingSpinner');
+
+            // Show Loading state
+            submitBtn.disabled = true;
+            spinner.classList.remove('hidden');
+
+            const payload = {
+                name: name,
+                status: attendance,
+                guests: parseInt(guests) || 1,
+                message: message,
+                timestamp: Date.now()
+            };
+
+            let sheetsSuccess = false;
+
+            // Send to Google Sheets if URL is configured
+            if (GOOGLE_SHEETS_URL && GOOGLE_SHEETS_URL !== "YOUR_DEPLOYED_WEB_APP_URL") {
+                try {
+                    const response = await fetch(GOOGLE_SHEETS_URL, {
+                        method: "POST",
+                        mode: "cors",
+                        headers: {
+                            "Content-Type": "text/plain;charset=utf-8"
+                        },
+                        body: JSON.stringify(payload)
+                    });
+
+                    const resText = await response.json();
+                    if (resText && resText.result === "success") {
+                        sheetsSuccess = true;
+                    }
+                } catch (err) {
+                    console.error("Gagal mengirim ke Google Sheets:", err);
+                }
+            } else {
+                console.warn("Peringatan: URL Google Sheets belum diatur di dalam variabel 'GOOGLE_SHEETS_URL'.");
+            }
+
+            // Save to local storage for the in-app Wishes guestbook display
+            saveToOfflineWishes(payload);
+
+            // Hide Loading State
+            submitBtn.disabled = false;
+            spinner.classList.add('hidden');
+
+            if (sheetsSuccess) {
+                showToast("Data masuk ke Google Sheets & Pesan disimpan!");
+            } else {
+                showToast("Pesan disimpan! (Konfigurasi Google Sheets belum aktif)");
+            }
+
+            document.getElementById('rsvpForm').reset();
+            document.getElementById('wishes').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Save entry locally to display
+        function saveToOfflineWishes(wish) {
+            let local = JSON.parse(localStorage.getItem('wedding_wishes_offline')) || [];
+            local.unshift(wish);
+            localStorage.setItem('wedding_wishes_offline', JSON.stringify(local));
+            renderLocalWishes();
+        }
+
+        // Render Local Guestbook List
+        function renderLocalWishes() {
+            const wishesContainer = document.getElementById('wishesContainer');
+            const local = JSON.parse(localStorage.getItem('wedding_wishes_offline')) || [];
+
+            wishesContainer.innerHTML = '';
+
+            if (local.length === 0) {
+                wishesContainer.innerHTML = `
+                    <p class="text-center text-sm text-gray-500 italic py-8">Belum ada ucapan dari tamu. Jadilah yang pertama memberikan doa restu!</p>
+                `;
+                return;
+            }
+
+            local.forEach(item => {
+                let badgeClass = "bg-white/10 text-gray-300";
+                if (item.status === "Hadir") {
+                    badgeClass = "bg-white text-black font-semibold";
+                } else if (item.status === "Tidak Hadir") {
+                    badgeClass = "bg-white/5 text-gray-500 border border-white/5";
+                }
+
+                const initial = item.name ? item.name.charAt(0).toUpperCase() : '?';
+
+                const wishCard = document.createElement('div');
+                wishCard.className = "bg-charcoal/40 border border-white/5 p-6 rounded-lg transition-all duration-300 hover:border-white/15";
+                wishCard.innerHTML = `
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 rounded-full bg-white/5 border border-white/10 flex items-center justify-center font-serif text-white text-lg font-bold flex-shrink-0">
+                            ${initial}
+                        </div>
+                        <div class="flex-grow min-w-0">
+                            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-1 mb-2">
+                                <h4 class="font-serif text-base text-white font-medium truncate">${item.name}</h4>
+                                <span class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded ${badgeClass} w-max">
+                                    ${item.status} ${item.status === "Hadir" ? `(${item.guests || 1} Tamu)` : ''}
+                                </span>
+                            </div>
+                            <p class="text-sm text-gray-300 leading-relaxed break-words">${item.message}</p>
+                        </div>
+                    </div>
+                `;
+                wishesContainer.appendChild(wishCard);
+            });
+        }
+
+        // Attach event listener dynamically for modules compliance
+        document.getElementById('rsvpForm').addEventListener('submit', handleRSVP);
+
+        // 6. LIGHTBOX FOR IMAGES
+        function openLightbox(index) {
+            currentImageIndex = index;
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImg = document.getElementById('lightboxImg');
+            lightboxImg.src = galleryImages[currentImageIndex];
+            
+            lightbox.classList.remove('hidden');
+            setTimeout(() => {
+                lightbox.classList.remove('opacity-0');
+            }, 50);
+        }
+
+        // Close Lightbox
+        function closeLightbox() {
+            const lightbox = document.getElementById('lightbox');
+            lightbox.classList.add('opacity-0');
+            setTimeout(() => {
+                lightbox.classList.add('hidden');
+            }, 300);
+        }
+
+        function nextImage() {
+            currentImageIndex = (currentImageIndex + 1) % galleryImages.length;
+            document.getElementById('lightboxImg').src = galleryImages[currentImageIndex];
+        }
+
+        function prevImage() {
+            currentImageIndex = (currentImageIndex - 1 + galleryImages.length) % galleryImages.length;
+            document.getElementById('lightboxImg').src = galleryImages[currentImageIndex];
+        }
+
+        document.getElementById('lightbox').addEventListener('click', (e) => {
+            if (e.target.id === 'lightbox' || e.target.closest('.max-w-\\[90\\%\\]') === null) {
+                if (!e.target.closest('button')) {
+                    closeLightbox();
+                }
+            }
+        });
+
+        // 7. SCROLL ANIMATIONS
+        function initScrollAnimations() {
+            const elements = document.querySelectorAll('.fade-in-element');
+            const heroBg = document.getElementById('heroBg');
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                    }
+                });
+            }, {
+                threshold: 0.1,
+                rootMargin: "0px 0px -50px 0px"
+            });
+
+            elements.forEach(el => observer.observe(el));
+
+            window.addEventListener('scroll', () => {
+                const scrolled = window.scrollY;
+                if (scrolled < window.innerHeight) {
+                    const rate = scrolled * 0.15;
+                    heroBg.style.transform = `scale(1.1) translateY(${rate}px)`;
+                }
+            });
+        }
+
+        // Expose control functions to global window object
+        window.openInvitation = openInvitation;
+        window.toggleMusic = toggleMusic;
+        window.copyAccount = copyAccount;
+        window.openLightbox = openLightbox;
+        window.closeLightbox = closeLightbox;
+        window.nextImage = nextImage;
+        window.prevImage = prevImage;
+    </script>
+</body>
+</html>
